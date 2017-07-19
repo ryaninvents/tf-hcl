@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "description": "tf-hcl",
   "license": "MIT",
-  "repository": "",
-  "author": "",
+  "repository": "https://github.com/r24y/tf-hcl.git",
+  "author": "Ryan Muller Kennedy <r24y@users.noreply.github.com> (https://www.rmkennedy.com)",
   "keywords": [
     ""
   ],
