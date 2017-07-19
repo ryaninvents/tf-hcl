@@ -25,8 +25,13 @@
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "moo": "^0.3.3",
+    "nearley": "^2.10.2",
+    "unist-builder": "^1.0.2"
+  },
   "devDependencies": {
+    "@types/moo": "^0.3.0",
     "@types/node": "^7.0.0",
     "ava": "^0.20.0",
     "coveralls": "^2.0.0",

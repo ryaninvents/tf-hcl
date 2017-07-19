@@ -1,18 +1,18 @@
-import * as moo from 'moo';
+import * as moo from "moo";
 
 /**
  * Lexer for main config body.
  */
-const main = {};
+const main: moo.Rules = {};
 
 /**
  * Lexer for string contents.
  */
-const string = {};
+const stringLiteral: moo.Rules = {};
 
 /**
  * Lexer for interpolated values.
  */
-const interpolated = {};
+const interpolated: moo.Rules = {};
 
-export default moo.states({main, string, interpolated})
+export default moo.states({ main, stringLiteral, interpolated });
