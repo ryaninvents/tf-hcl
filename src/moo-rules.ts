@@ -7,7 +7,11 @@ const main: moo.Rules = {
   beginLineComment: { match: ["#", "//"], push: "lineComment" },
   beginBlockComment: { match: "/*", push: "blockComment" },
   beginHeredoc: { match: /<<\w+\n/, lineBreaks: true, push: "heredocLiteral" },
-  beginIndentedHeredoc: { match: /<<-\w+\n/, lineBreaks: true, push: "heredocLiteral" },
+  beginIndentedHeredoc: {
+    match: /<<-\w+\n/,
+    lineBreaks: true,
+    push: "heredocLiteral"
+  },
   beginString: { match: '"', push: "stringLiteral" },
 
   baseTenNumber: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/,
@@ -26,10 +30,10 @@ const main: moo.Rules = {
  * Heredocs are the reason we need to implement a lexer on top of Moo to manage state.
  */
 const heredocLiteral: moo.Rules = {
-  escapedDollar: {match: "$$"},
-  newline: {match: "\n", lineBreaks: true},
+  escapedDollar: { match: "$$" },
+  newline: { match: "\n", lineBreaks: true },
   beginInterpolation: { match: "${", push: "interpolated" },
-  stringChar: {match: /.+?/, lineBreaks: false},
+  stringChar: { match: /.+?/, lineBreaks: false }
 };
 
 /**
@@ -43,7 +47,7 @@ const stringLiteral: moo.Rules = {
   beginInterpolation: heredocLiteral.beginInterpolation,
   newline: heredocLiteral.newline,
   endString: { match: '"', pop: 1 },
-  stringChar: {match: /.+?/, lineBreaks: true},
+  stringChar: { match: /.+?/, lineBreaks: true }
 };
 
 /**
@@ -99,4 +103,11 @@ const blockComment: moo.Rules = {
 };
 
 export default () =>
-  moo.states({ main, stringLiteral, heredocLiteral, interpolated, lineComment, blockComment });
+  moo.states({
+    main,
+    stringLiteral,
+    heredocLiteral,
+    interpolated,
+    lineComment,
+    blockComment
+  });

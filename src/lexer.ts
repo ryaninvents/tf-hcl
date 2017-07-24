@@ -88,9 +88,7 @@ export default class HclLexer {
       if (this.lastToken && this.lastToken.type === "newline") {
         const { line, col } = this.moo;
         if (heredoc.indented) {
-          const match = text.match(
-            getRegexForIndentedHeredoc(heredoc.tag)
-          );
+          const match = text.match(getRegexForIndentedHeredoc(heredoc.tag));
           if (match) {
             // Increment moo index by `length + 1` to account for newline.
             this.moo.index += match[0].length + 1;
@@ -126,26 +124,27 @@ export default class HclLexer {
     }
     const nextToken = this.moo.next();
 
-    if (nextToken) switch (nextToken.type) {
-      case "beginHeredoc":
-        this.heredocStack.push({
-          tag: nextToken.value.slice(2).trim(),
-          indented: false,
-          line: nextToken.line,
-          col: nextToken.col
-        });
-        break;
-      case "beginIndentedHeredoc":
-        this.heredocStack.push({
-          tag: nextToken.value.slice(3).trim(),
-          indented: true,
-          line: nextToken.line,
-          col: nextToken.col
-        });
-        break;
-      default:
-        break;
-    }
+    if (nextToken)
+      switch (nextToken.type) {
+        case "beginHeredoc":
+          this.heredocStack.push({
+            tag: nextToken.value.slice(2).trim(),
+            indented: false,
+            line: nextToken.line,
+            col: nextToken.col
+          });
+          break;
+        case "beginIndentedHeredoc":
+          this.heredocStack.push({
+            tag: nextToken.value.slice(3).trim(),
+            indented: true,
+            line: nextToken.line,
+            col: nextToken.col
+          });
+          break;
+        default:
+          break;
+      }
 
     this.lastToken = nextToken;
 
