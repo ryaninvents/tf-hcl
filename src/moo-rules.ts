@@ -4,20 +4,20 @@ import * as moo from "moo";
  * Lexer for main config body.
  */
 const main: moo.Rules = {
-  beginLineComment: {match: ['#', '//'], push: 'lineComment'},
-  beginBlockComment: {match: '/*', push: 'blockComment'},
-  beginHeredoc: {match: /<<\w+\n/, push: 'heredocLiteral'},
-  beginIndentedHeredoc: {match: /<<-\w+\n/, push: 'heredocLiteral'},
-  beginString: {match: "\"", push: 'stringLiteral'},
+  beginLineComment: { match: ["#", "//"], push: "lineComment" },
+  beginBlockComment: { match: "/*", push: "blockComment" },
+  beginHeredoc: { match: /<<\w+\n/, push: "heredocLiteral" },
+  beginIndentedHeredoc: { match: /<<-\w+\n/, push: "heredocLiteral" },
+  beginString: { match: '"', push: "stringLiteral" },
 
   baseTenNumber: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/,
-  boolean: ['true', 'on', 'yes', 'false', 'off', 'no'],
+  boolean: ["true", "on", "yes", "false", "off", "no"],
   identifier: /[A-Za-z_][A-Za-z0-9_-]*/,
-  openBrace: '{',
-  closeBrace: '}',
-  dot: '.',
-  equal: '=',
-  ws: {match: /\s+/, lineBreaks: true},
+  openBrace: "{",
+  closeBrace: "}",
+  dot: ".",
+  equal: "=",
+  ws: { match: /\s+/, lineBreaks: true }
 };
 
 /**
@@ -27,8 +27,8 @@ const main: moo.Rules = {
  */
 const heredocLiteral: moo.Rules = {
   escapedDollar: "$$",
-  newline: '\n',
-  beginInterpolation: {match: "${", push: 'interpolated'},
+  newline: "\n",
+  beginInterpolation: { match: "${", push: "interpolated" }
 };
 
 /**
@@ -40,7 +40,7 @@ const heredocLiteral: moo.Rules = {
 const stringLiteral: moo.Rules = {
   beginInterpolation: heredocLiteral.beginInterpolation,
   newline: heredocLiteral.newline,
-  endString: {match: "\"", pop: 1},
+  endString: { match: '"', pop: 1 }
 };
 
 /**
@@ -70,12 +70,12 @@ const interpolated: moo.Rules = {
   identifier: main.identifier,
   dot: main.dot,
 
-  endInterpolation: {match: "}", pop: 1},
+  endInterpolation: { match: "}", pop: 1 },
   openParen: "(",
   closeParen: ")",
   openSqBrace: "[",
   closeSqBrace: "]",
-  ws: main.ws,
+  ws: main.ws
 };
 
 /**
@@ -83,7 +83,7 @@ const interpolated: moo.Rules = {
  */
 const lineComment: moo.Rules = {
   commentText: /[^\n]*?/,
-  endComment: {match: '\n', pop: 1},
+  endComment: { match: "\n", pop: 1 }
 };
 
 /**
@@ -91,8 +91,9 @@ const lineComment: moo.Rules = {
  */
 const blockComment: moo.Rules = {
   beginBlockComment: main.beginBlockComment,
-  endBlockComment: {match: "*/", pop: 1},
-  commentText: {match: /.*?/, lineBreaks: true},
+  endBlockComment: { match: "*/", pop: 1 },
+  commentText: { match: /.*?/, lineBreaks: true }
 };
 
-export default () => moo.states({ main, stringLiteral, interpolated, lineComment, blockComment });
+export default () =>
+  moo.states({ main, stringLiteral, interpolated, lineComment, blockComment });

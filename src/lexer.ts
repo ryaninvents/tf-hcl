@@ -1,30 +1,30 @@
-import makeBaseLexer from './moo-rules';
+import makeBaseLexer from "./moo-rules";
 
 export type Token = {
-  type: string,
-  value: string,
-  line: number,
-  col: number,
+  type: string;
+  value: string;
+  line: number;
+  col: number;
 };
 
 export type HeredocState = {
-  indented: boolean,
-  tag: string,
-  line: number,
-  col: number,
+  indented: boolean;
+  tag: string;
+  line: number;
+  col: number;
 };
 
 export type MooState = {
-  line: number,
-  col: number,
-  state: any,
+  line: number;
+  col: number;
+  state: any;
 };
 
 export type Info = {
-  mooState: MooState,
-  mooStack: Array<any>,
-  heredocStack: HeredocState[],
-  lastToken: Token | null,
+  mooState: MooState;
+  mooStack: Array<any>;
+  heredocStack: HeredocState[];
+  lastToken: Token | null;
 };
 
 /**
@@ -54,7 +54,7 @@ export default class HclLexer {
       mooState: this.moo.save(),
       mooStack: this.moo.stack,
       heredocStack: this.heredocStack,
-      lastToken: this.lastToken,
+      lastToken: this.lastToken
     };
   }
 
@@ -64,7 +64,7 @@ export default class HclLexer {
    * @override
    */
   reset(chunk: string, info: Info) {
-    const {mooState, mooStack, heredocStack} = info;
+    const { mooState, mooStack, heredocStack } = info;
     this.heredocStack = heredocStack;
     this.moo.reset(chunk, mooState);
     this.moo.stack = mooStack;
@@ -78,11 +78,13 @@ export default class HclLexer {
    */
   next(): Token {
     if (this.heredocStack.length) {
-      const heredoc = this.heredocStack[this.heredocStack.length - 1]
-      if (this.lastToken.type === 'newline') {
-        const {line, col} = this.moo;
+      const heredoc = this.heredocStack[this.heredocStack.length - 1];
+      if (this.lastToken.type === "newline") {
+        const { line, col } = this.moo;
         if (heredoc.indented) {
-          const match = this.moo.buffer.match(getRegexForIndentedHeredoc(heredoc.tag))
+          const match = this.moo.buffer.match(
+            getRegexForIndentedHeredoc(heredoc.tag)
+          );
           if (match) {
             this.moo.buffer = this.moo.buffer.slice(match[0].length);
             this.moo.popState();
@@ -90,14 +92,14 @@ export default class HclLexer {
             this.moo.line++;
             this.moo.col = 1;
             return {
-              type: 'endHeredoc',
+              type: "endHeredoc",
               value: match[0],
               line,
-              col,
+              col
             };
           }
         } else {
-          const endTag = `${heredoc.tag}\n`
+          const endTag = `${heredoc.tag}\n`;
           if (this.moo.buffer.indexOf(endTag) === 0) {
             this.moo.buffer = this.moo.buffer.slice(endTag.length);
             this.moo.popState();
@@ -105,11 +107,11 @@ export default class HclLexer {
             this.moo.line++;
             this.moo.col = 1;
             return {
-              type: 'endHeredoc',
+              type: "endHeredoc",
               value: endTag,
               line,
-              col,
-            }
+              col
+            };
           }
         }
       }
@@ -117,23 +119,24 @@ export default class HclLexer {
     const nextToken = this.moo.next();
 
     switch (nextToken.type) {
-      case 'beginHeredoc':
+      case "beginHeredoc":
         this.heredocStack.push({
           tag: nextToken.value.slice(2),
           indented: false,
           line: nextToken.line,
-          col: nextToken.col,
+          col: nextToken.col
         });
         break;
-      case 'beginIndentedHeredoc':
+      case "beginIndentedHeredoc":
         this.heredocStack.push({
           tag: nextToken.value.slice(3),
           indented: true,
           line: nextToken.line,
-          col: nextToken.col,
+          col: nextToken.col
         });
         break;
-      default: break;
+      default:
+        break;
     }
 
     this.lastToken = nextToken;
@@ -156,6 +159,6 @@ export default class HclLexer {
    * @override
    */
   has(tokenType: string): boolean {
-    return (tokenType === 'endHeredoc') || this.moo.has(tokenType);
+    return tokenType === "endHeredoc" || this.moo.has(tokenType);
   }
 }
