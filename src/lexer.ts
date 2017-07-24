@@ -37,11 +37,12 @@ function getRegexForIndentedHeredoc(tag: string) {
 
 export default class HclLexer {
   moo: any;
-  heredocStack: HeredocState[];
+  heredocStack: HeredocState[] = [];
   lastToken: Token | null = null;
 
-  constructor() {
+  constructor(input: string) {
     this.moo = makeBaseLexer();
+    this.reset(input);
   }
 
   /**
@@ -63,12 +64,16 @@ export default class HclLexer {
    *
    * @override
    */
-  reset(chunk: string, info: Info) {
-    const { mooState, mooStack, heredocStack } = info;
-    this.heredocStack = heredocStack;
-    this.moo.reset(chunk, mooState);
-    this.moo.stack = mooStack;
-    this.lastToken = info.lastToken;
+  reset(chunk: string, info?: Info) {
+    if (info) {
+      const { mooState, mooStack, heredocStack } = info;
+      this.heredocStack = heredocStack;
+      this.moo.reset(chunk, mooState);
+      this.moo.stack = mooStack;
+      this.lastToken = info.lastToken;
+      return;
+    }
+    this.moo.reset(chunk);
   }
 
   /**
@@ -79,7 +84,7 @@ export default class HclLexer {
   next(): Token {
     if (this.heredocStack.length) {
       const heredoc = this.heredocStack[this.heredocStack.length - 1];
-      if (this.lastToken.type === "newline") {
+      if (this.lastToken && this.lastToken.type === "newline") {
         const { line, col } = this.moo;
         if (heredoc.indented) {
           const match = this.moo.buffer.match(
@@ -118,7 +123,7 @@ export default class HclLexer {
     }
     const nextToken = this.moo.next();
 
-    switch (nextToken.type) {
+    if (nextToken) switch (nextToken.type) {
       case "beginHeredoc":
         this.heredocStack.push({
           tag: nextToken.value.slice(2),

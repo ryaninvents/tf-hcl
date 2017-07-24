@@ -6,8 +6,8 @@ import * as moo from "moo";
 const main: moo.Rules = {
   beginLineComment: { match: ["#", "//"], push: "lineComment" },
   beginBlockComment: { match: "/*", push: "blockComment" },
-  beginHeredoc: { match: /<<\w+\n/, push: "heredocLiteral" },
-  beginIndentedHeredoc: { match: /<<-\w+\n/, push: "heredocLiteral" },
+  beginHeredoc: { match: /<<\w+\n/, lineBreaks: true, push: "heredocLiteral" },
+  beginIndentedHeredoc: { match: /<<-\w+\n/, lineBreaks: true, push: "heredocLiteral" },
   beginString: { match: '"', push: "stringLiteral" },
 
   baseTenNumber: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/,
@@ -26,9 +26,10 @@ const main: moo.Rules = {
  * Heredocs are the reason we need to implement a lexer on top of Moo to manage state.
  */
 const heredocLiteral: moo.Rules = {
-  escapedDollar: "$$",
-  newline: "\n",
-  beginInterpolation: { match: "${", push: "interpolated" }
+  escapedDollar: {match: "$$"},
+  newline: {match: "\n", lineBreaks: true},
+  beginInterpolation: { match: "${", push: "interpolated" },
+  stringChar: {match: /.+?/, lineBreaks: false},
 };
 
 /**
@@ -38,9 +39,11 @@ const heredocLiteral: moo.Rules = {
  * - Single unescaped quote (`"`) terminates the string.
  */
 const stringLiteral: moo.Rules = {
+  escapedDollar: heredocLiteral.escapedDollar,
   beginInterpolation: heredocLiteral.beginInterpolation,
   newline: heredocLiteral.newline,
-  endString: { match: '"', pop: 1 }
+  endString: { match: '"', pop: 1 },
+  stringChar: {match: /.+?/, lineBreaks: true},
 };
 
 /**
@@ -82,8 +85,8 @@ const interpolated: moo.Rules = {
  * Lexer for line comments.
  */
 const lineComment: moo.Rules = {
-  commentText: /[^\n]*?/,
-  endComment: { match: "\n", pop: 1 }
+  commentText: /[^\n]+?/,
+  endComment: { match: "\n", lineBreaks: true, pop: 1 }
 };
 
 /**
@@ -92,8 +95,8 @@ const lineComment: moo.Rules = {
 const blockComment: moo.Rules = {
   beginBlockComment: main.beginBlockComment,
   endBlockComment: { match: "*/", pop: 1 },
-  commentText: { match: /.*?/, lineBreaks: true }
+  commentText: { match: /.+?/, lineBreaks: true }
 };
 
 export default () =>
-  moo.states({ main, stringLiteral, interpolated, lineComment, blockComment });
+  moo.states({ main, stringLiteral, heredocLiteral, interpolated, lineComment, blockComment });
