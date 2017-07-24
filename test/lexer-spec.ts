@@ -7,6 +7,13 @@ foo = {
   bar = "baz \$\${quux} \${var.mumble}"
   quux = 42
 }
+
+// Example of a heredoc
+mumble = <<EOF
+foo bar \${baz(2 + 2)}
+EOF
+
+more_content = true
 `;
   const lex = new HclLexer(SOURCE_TEXT);
   const output = [];

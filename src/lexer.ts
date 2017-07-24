@@ -83,15 +83,17 @@ export default class HclLexer {
    */
   next(): Token {
     if (this.heredocStack.length) {
+      const text = this.moo.buffer.slice(this.moo.index);
       const heredoc = this.heredocStack[this.heredocStack.length - 1];
       if (this.lastToken && this.lastToken.type === "newline") {
         const { line, col } = this.moo;
         if (heredoc.indented) {
-          const match = this.moo.buffer.match(
+          const match = text.match(
             getRegexForIndentedHeredoc(heredoc.tag)
           );
           if (match) {
-            this.moo.buffer = this.moo.buffer.slice(match[0].length);
+            // Increment moo index by `length + 1` to account for newline.
+            this.moo.index += match[0].length + 1;
             this.moo.popState();
             this.heredocStack.pop();
             this.moo.line++;
@@ -105,8 +107,9 @@ export default class HclLexer {
           }
         } else {
           const endTag = `${heredoc.tag}\n`;
-          if (this.moo.buffer.indexOf(endTag) === 0) {
-            this.moo.buffer = this.moo.buffer.slice(endTag.length);
+          if (text.indexOf(endTag) === 0) {
+            // Increment moo index by `length + 1` to account for newline.
+            this.moo.index += endTag.length + 1;
             this.moo.popState();
             this.heredocStack.pop();
             this.moo.line++;
@@ -126,7 +129,7 @@ export default class HclLexer {
     if (nextToken) switch (nextToken.type) {
       case "beginHeredoc":
         this.heredocStack.push({
-          tag: nextToken.value.slice(2),
+          tag: nextToken.value.slice(2).trim(),
           indented: false,
           line: nextToken.line,
           col: nextToken.col
@@ -134,7 +137,7 @@ export default class HclLexer {
         break;
       case "beginIndentedHeredoc":
         this.heredocStack.push({
-          tag: nextToken.value.slice(3),
+          tag: nextToken.value.slice(3).trim(),
           indented: true,
           line: nextToken.line,
           col: nextToken.col
