@@ -10,6 +10,8 @@ const main: moo.Rules = {
   beginIndentedHeredoc: {match: /<<-\w+\n/, push: 'heredocLiteral'},
   beginString: {match: "\"", push: 'stringLiteral'},
 
+  baseTenNumber: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/,
+  boolean: ['true', 'on', 'yes', 'false', 'off', 'no'],
   identifier: /[A-Za-z_][A-Za-z0-9_-]*/,
   openBrace: '{',
   closeBrace: '}',
@@ -25,6 +27,7 @@ const main: moo.Rules = {
  */
 const heredocLiteral: moo.Rules = {
   escapedDollar: "$$",
+  newline: '\n',
   beginInterpolation: {match: "${", push: 'interpolated'},
 };
 
@@ -36,6 +39,7 @@ const heredocLiteral: moo.Rules = {
  */
 const stringLiteral: moo.Rules = {
   beginInterpolation: heredocLiteral.beginInterpolation,
+  newline: heredocLiteral.newline,
   endString: {match: "\"", pop: 1},
 };
 
@@ -47,7 +51,10 @@ const interpolated: moo.Rules = {
   beginBlockComment: main.beginBlockComment,
   beginHeredoc: main.beginHeredoc,
   beginIndentedHeredoc: main.beginIndentedHeredoc,
+  beginString: main.beginString,
 
+  baseTenNumber: main.baseTenNumber,
+  boolean: main.boolean,
   comparison: ["==", "!=", ">", "<", ">=", "<="],
   boolAnd: "&&",
   boolOr: "||",
@@ -63,13 +70,11 @@ const interpolated: moo.Rules = {
   identifier: main.identifier,
   dot: main.dot,
 
-  openBrace: main.openBrace,
-  closeBrace: main.closeBrace,
+  endInterpolation: {match: "}", pop: 1},
   openParen: "(",
   closeParen: ")",
   openSqBrace: "[",
   closeSqBrace: "]",
-  beginString: main.beginString,
   ws: main.ws,
 };
 
@@ -87,7 +92,7 @@ const lineComment: moo.Rules = {
 const blockComment: moo.Rules = {
   beginBlockComment: main.beginBlockComment,
   endBlockComment: {match: "*/", pop: 1},
-  commentText: /.*?/,
+  commentText: {match: /.*?/, lineBreaks: true},
 };
 
-export default moo.states({ main, stringLiteral, interpolated, lineComment, blockComment });
+export default () => moo.states({ main, stringLiteral, interpolated, lineComment, blockComment });
