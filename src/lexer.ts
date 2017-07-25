@@ -127,7 +127,7 @@ export default class HclLexer {
     }
     const nextToken = this.moo.next();
 
-    if (nextToken)
+    if (nextToken) {
       switch (nextToken.type) {
         case "beginHeredoc":
           this.heredocStack.push({
@@ -148,6 +148,7 @@ export default class HclLexer {
         default:
           break;
       }
+    }
 
     this.lastToken = nextToken;
 
