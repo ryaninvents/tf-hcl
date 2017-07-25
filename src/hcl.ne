@@ -37,9 +37,11 @@ function asNode(type: string, func: (...args: any[]) => any): (...args: any[]) =
 # A config is a series of declarations.
 Config -> _ Declarations:? _ {% asNode('Config', ([, children]) => ({ children })) %}
 
-Declarations -> Declaration (_ Declaration {% nth(1) %} ):* {%
-  ([first, rest]) => rest ? [first].concat(rest) : [first]
-%}
+Declarations ->
+  Declaration (_ Declaration {% nth(1) %} ):*
+  {%
+    ([first, rest]) => rest ? [first].concat(rest) : [first]
+  %}
 
 # A declaration can be either a member declaration or an assignment.
 Declaration -> MemberDeclaration {% id %} | Assignment {% id %}
@@ -48,7 +50,8 @@ Declaration -> MemberDeclaration {% id %} | Assignment {% id %}
 # @example
 #     resource "aws_instance" "foo" {}
 MemberDeclaration ->
-  Identifier ws (Expression {% nth(0) %} | Declaration {% id %}) {%
+  Identifier ws (Expression {% nth(0) %} | Declaration {% id %})
+  {%
     asNode('MemberDeclaration', ([left, , right]) => ({ children: [left, right] }))
   %}
 
@@ -56,14 +59,16 @@ MemberDeclaration ->
 # @example
 #     instance_count = 42
 Assignment ->
-  Identifier _ Equals _ Expression {%
+  Identifier _ Equals _ Expression
+  {%
     asNode('Assignment', ([left, , , , right]) => ({ children: [left, right] }))
   %}
 
 Expression -> Section {% id %} | Primitive {% id %}
 
 Section ->
-  %openBrace _ (Declarations _ {% nth(0) %} ):? %closeBrace {%
+  %openBrace _ (Declarations _ {% nth(0) %} ):? %closeBrace
+  {%
     asNode('Section', ([,,children]) => ({ children }))
   %}
 
@@ -77,15 +82,15 @@ Boolean -> %boolean
 
 Number -> %baseTenNumber
 
-String -> StringLiteral {% id %} # | TemplateString # | Heredoc | IndentedHeredoc
+String -> StringLiteral {% id %} # | Heredoc | IndentedHeredoc
 
-StringLiteral -> %beginString StringContent:* %endString {% ([, value]) => ({type: 'StringLiteral', value: asString(value)}) %}
+StringLiteral ->
+  %beginString StringContent:* %endString
+  {%
+    asNode('StringLiteral', ([, value]) => ({value: asString(value)}))
+  %}
 
 StringContent -> %stringChar {% asString %} | %newline {% asString %} | %escapedDollar {% asString %}
-
-TemplateString -> %beginString TemplateStringContent:* %endString
-
-TemplateStringContent -> StringContent
 
 # ## Tokens
 Equals -> %equal
