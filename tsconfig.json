@@ -12,6 +12,7 @@
     "preserveConstEnums": true,
     "removeComments": true,
     "typeRoots": [
+      "./typings",
       "./node_modules/@types"
     ]
   },

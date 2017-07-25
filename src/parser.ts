@@ -1,0 +1,1 @@
+import nearley = require('nearley');
