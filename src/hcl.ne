@@ -63,6 +63,12 @@ function locationFromToken(token: Token) {
     }
 }
 
+function locationFromTokens(first: Token, last: Token) {
+  const start = locationFromToken(first).start;
+  const end = locationFromToken(last).end;
+  return {start, end};
+}
+
 function asTokenNode(type: string, func: (...args: any[]) => any = mergeValue): (...args: any[]) => any {
   return asNode(type, (data, offset, reject) => {
     const [token] = data;
@@ -99,7 +105,13 @@ Declaration -> MemberDeclaration {% id %} | Assignment {% id %}
 MemberDeclaration ->
   Key ws (Expression {% nth(0) %} | Declaration {% id %})
   {%
-    asNode('MemberDeclaration', ([left, , right]) => ({ children: [left, right] }))
+    asNode('MemberDeclaration', ([left, , right]) => ({
+      children: [left, right],
+      location: {
+        start: left.location.start,
+        end: right.location.end,
+      },
+    }))
   %}
 
 # An assignment uses the equals sign to set a value.
@@ -108,7 +120,13 @@ MemberDeclaration ->
 Assignment ->
   Key _ Equals _ Expression
   {%
-    asNode('Assignment', ([left, , , , right]) => ({ children: [left, right] }))
+    asNode('Assignment', ([left, , , , right]) => ({
+      children: [left, right],
+      location: {
+        start: left.location.start,
+        end: right.location.end,
+      },
+    }))
   %}
 
 Expression -> Section {% id %} | Primitive {% id %}
@@ -116,11 +134,14 @@ Expression -> Section {% id %} | Primitive {% id %}
 Section ->
   %openBrace _ (Declarations _ {% nth(0) %} ):? %closeBrace
   {%
-    asNode('Section', ([,,children]) => ({ children }))
+    asNode('Section', ([openBrace,,children, closeBrace]) => ({
+      children,
+      location: locationFromTokens(openBrace, closeBrace),
+    }))
   %}
 
-Key -> Identifier {% asNode('Key', ([d]) => ({ name: d.value, children: [d] })) %}
-  | StringLiteral {% asNode('Key', ([d]) => ({ name: d, children: [d] })) %}
+Key -> Identifier {% asNode('Key', ([d]) => ({ name: d.value, children: [d], location: d.location })) %}
+  | StringLiteral {% asNode('Key', ([d]) => ({ name: d, children: [d], location: d.location })) %}
 
 Identifier -> %identifier {% asTokenNode('Identifier', ([d]: Token[]) => ({value: d.value})) %}
 
@@ -138,7 +159,10 @@ String -> StringLiteral {% id %} | TemplateString {% id %} # | Heredoc | Indente
 StringLiteral ->
   %beginString StringContent:? %endString
   {%
-    asNode('StringLiteral', ([, value]) => ({ value }))
+    asNode('StringLiteral', ([start, value, end]) => ({
+      value,
+      location: locationFromTokens(start, end),
+    }))
   %}
 
 StringContent -> StringChar:+ {% ([d]) => join(d) %}
@@ -161,15 +185,19 @@ TemplateString ->
     %}
   ):+ StringContent:? %endString
   {%
-    asNode('TemplateString', ([, startContents, endContents]) => ({
-      children: flatten(startContents).concat(endContents ? [endContents] : [])
+    asNode('TemplateString', ([beginString, startContents, endContents, endString]) => ({
+      children: flatten(startContents).concat(endContents ? [endContents] : []),
+      location: locationFromTokens(beginString, endString),
     }))
   %}
 
 Interpolation ->
   %beginInterpolation _ InterpolatedExpression _ %endInterpolation
   {%
-    asNode('Interpolation', ([,, expression]) => ({ children: [expression] }))
+    asNode('Interpolation', ([beginInterp, , expression, , endInterp]) => ({
+      children: [expression],
+      location: locationFromTokens(beginInterp, endInterp),
+    }))
   %}
 
 InterpolatedExpression
@@ -179,7 +207,14 @@ InterpolatedExpression
 FunctionCall ->
   Identifier %openParen _ InterpolatedExpression _ %closeParen
   {%
-    asNode('FunctionCall', ([funcName,,,arg]) => ({name: funcName.value, children: [arg]}))
+    asNode('FunctionCall', ([funcName,,,arg,,closeParen]) => ({
+      name: funcName.value,
+      children: [arg],
+      location: {
+        start: funcName.location.start,
+        end: locationFromToken(closeParen).end,
+      },
+    }))
   %}
 
 # ## Tokens
