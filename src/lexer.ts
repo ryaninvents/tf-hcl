@@ -1,31 +1,31 @@
 import makeBaseLexer from "./moo-rules";
 
-export type Token = {
+export interface Token {
   type: string;
   value: string;
   line: number;
   col: number;
-};
+}
 
-export type HeredocState = {
+export interface HeredocState {
   indented: boolean;
   tag: string;
   line: number;
   col: number;
-};
+}
 
-export type MooState = {
+export interface MooState {
   line: number;
   col: number;
   state: any;
-};
+}
 
-export type Info = {
+export interface Info {
   mooState: MooState;
   mooStack: Array<any>;
   heredocStack: HeredocState[];
   lastToken: Token | null;
-};
+}
 
 /**
  * Given a tag representing an indented heredoc, return a RegExp that will detect the
@@ -36,11 +36,11 @@ function getRegexForIndentedHeredoc(tag: string) {
 }
 
 export default class HclLexer {
-  moo: any;
-  heredocStack: HeredocState[] = [];
-  lastToken: Token | null = null;
+  private moo: any;
+  private heredocStack: HeredocState[] = [];
+  private lastToken: Token | null = null;
 
-  constructor(input: string) {
+  constructor(input?: string) {
     this.moo = makeBaseLexer();
     this.reset(input);
   }

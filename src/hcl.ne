@@ -1,3 +1,16 @@
+@preprocessor typescript
+
+@{%
+import HclLexer from './lexer';
+
+const lexer = new HclLexer();
+
+function nil(): null { return null; }
+%}
+
+@lexer lexer
+
+# --------------------------------------------
 
 # A config is a series of declarations.
 Config -> _ Declarations:? _
@@ -21,11 +34,28 @@ Expression -> Declaration | Section | Primitive
 
 Section -> %openBrace _ (Declarations _):? %closeBrace
 
-Primitive -> Boolean | Number | String
-
-String -> QuoteString | Heredoc | IndentedHeredoc
-
 Identifier -> %identifier | QuoteString
 
-_ -> ws:?
-ws -> %ws
+# ## Literals
+Primitive -> Boolean | Number | String
+
+Boolean -> %boolean
+
+Number -> %baseTenNumber
+
+String -> QuoteString # | Heredoc | IndentedHeredoc
+
+QuoteString -> %beginString StringContent:* %endString
+
+StringContent -> %stringChar | %newline | %escapedDollar
+
+# ## Tokens
+Equals -> %equal
+
+# ## Whitespace and comments
+_ -> ws:? {% nil %}
+ws -> (%ws | LineComment | BlockComment) {% nil %}
+
+LineComment -> %beginLineComment %commentText:* %endComment
+
+BlockComment -> %beginBlockComment (%commentText | BlockComment):* %endBlockComment

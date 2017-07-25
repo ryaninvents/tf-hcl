@@ -2,6 +2,9 @@ coverage/
 node_modules/
 npm-debug.log
 .nyc_output
-lib
-lib_test
+/lib
+/lib_test/src
+/lib_test/test/**/*-spec.js
 /package-lock.json
+
+/src/hcl.ne.ts
