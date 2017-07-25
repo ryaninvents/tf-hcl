@@ -5,6 +5,9 @@ export interface Token {
   value: string;
   line: number;
   col: number;
+  lineBreaks?: number;
+  offset?: number;
+  size?: number;
 }
 
 export interface HeredocState {

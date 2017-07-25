@@ -18,21 +18,68 @@ function nth(i: number) {
   return (data: any[]): any => data[i];
 }
 
+function flatten(d: any[][]): any[] {
+  return d.reduce((a, b) => a.concat(b), []);
+}
+
+function join(d: string[]): string {
+  return d.join('');
+}
+
 function asNode(type: string, func: (...args: any[]) => any): (...args: any[]) => any {
-  return (data, location, reject) => {
-    const node = func(data, location, reject);
+  return (data, offset, reject) => {
+    const node = func(data, offset, reject);
     return {
       type,
-      location,
       ...node,
     };
   };
 }
+
+function mergeValue([t]: Token[]): any {
+  return {value: t.value};
+}
+
+function locationFromToken(token: Token) {
+    const {line, col: column, lineBreaks, size, value, offset} = token;
+    if (lineBreaks === 0) {
+      return {
+        start: {line, column, offset},
+        end: {
+          line,
+          column: column + size,
+          offset: offset + size,
+        },
+      };
+    } else {
+      return {
+        start: {line, column, offset},
+        end: {
+          line: line + lineBreaks,
+          column: value.length - value.lastIndexOf('\n'),
+          offset: offset + size,
+        },
+      };
+    }
+}
+
+function asTokenNode(type: string, func: (...args: any[]) => any = mergeValue): (...args: any[]) => any {
+  return asNode(type, (data, offset, reject) => {
+    const [token] = data;
+    return {
+      ...func(data, offset, reject),
+      location: locationFromToken(token),
+    };
+  });
+}
+
 %}
 
 @lexer lexer
 
 # --------------------------------------------
+
+# ## Main config body
 
 # A config is a series of declarations.
 Config -> _ Declarations:? _ {% asNode('Config', ([, children]) => ({ children })) %}
@@ -50,7 +97,7 @@ Declaration -> MemberDeclaration {% id %} | Assignment {% id %}
 # @example
 #     resource "aws_instance" "foo" {}
 MemberDeclaration ->
-  Identifier ws (Expression {% nth(0) %} | Declaration {% id %})
+  Key ws (Expression {% nth(0) %} | Declaration {% id %})
   {%
     asNode('MemberDeclaration', ([left, , right]) => ({ children: [left, right] }))
   %}
@@ -59,7 +106,7 @@ MemberDeclaration ->
 # @example
 #     instance_count = 42
 Assignment ->
-  Identifier _ Equals _ Expression
+  Key _ Equals _ Expression
   {%
     asNode('Assignment', ([left, , , , right]) => ({ children: [left, right] }))
   %}
@@ -72,25 +119,68 @@ Section ->
     asNode('Section', ([,,children]) => ({ children }))
   %}
 
-Identifier -> %identifier {% asNode('Identifier', ([d]: Token[]) => ({value: d.value})) %}
-  | StringLiteral {% asNode('Identifier', (d) => ({ value: d })) %}
+Key -> Identifier {% asNode('Key', ([d]) => ({ name: d.value, children: [d] })) %}
+  | StringLiteral {% asNode('Key', ([d]) => ({ name: d, children: [d] })) %}
+
+Identifier -> %identifier {% asTokenNode('Identifier', ([d]: Token[]) => ({value: d.value})) %}
+
+# -------------------------------------------
 
 # ## Literals
 Primitive -> Boolean {% id %} | Number {% id %} | String {% id %}
 
-Boolean -> %boolean
+Boolean -> %boolean {% asTokenNode('Boolean') %}
 
 Number -> %baseTenNumber
 
-String -> StringLiteral {% id %} # | Heredoc | IndentedHeredoc
+String -> StringLiteral {% id %} | TemplateString {% id %} # | Heredoc | IndentedHeredoc
 
 StringLiteral ->
-  %beginString StringContent:* %endString
+  %beginString StringContent:? %endString
   {%
-    asNode('StringLiteral', ([, value]) => ({value: asString(value)}))
+    asNode('StringLiteral', ([, value]) => ({ value }))
   %}
 
-StringContent -> %stringChar {% asString %} | %newline {% asString %} | %escapedDollar {% asString %}
+StringContent -> StringChar:+ {% ([d]) => join(d) %}
+
+StringChar
+  -> %stringChar {% asString %}
+  | %newline {% asString %}
+  | %escapedDollar {% asString %}
+
+TemplateString ->
+  %beginString (
+    StringContent:? Interpolation
+    {%
+      ([str, interp]) => {
+        if (str) {
+          return [str, interp];
+        }
+        return [interp];
+      }
+    %}
+  ):+ StringContent:? %endString
+  {%
+    asNode('TemplateString', ([, startContents, endContents]) => ({
+      children: flatten(startContents).concat(endContents ? [endContents] : [])
+    }))
+  %}
+
+Interpolation ->
+  %beginInterpolation _ InterpolatedExpression _ %endInterpolation
+  {%
+    asNode('Interpolation', ([,, expression]) => ({ children: [expression] }))
+  %}
+
+InterpolatedExpression
+  -> FunctionCall {% id %}
+  | Primitive {% id %}
+
+FunctionCall ->
+  Identifier %openParen _ InterpolatedExpression _ %closeParen
+  {%
+    asNode('FunctionCall', ([funcName,,,arg]) => ({name: funcName.value, children: [arg]}))
+  %}
 
 # ## Tokens
 Equals -> %equal
