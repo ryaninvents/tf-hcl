@@ -102,12 +102,13 @@ const blockComment: moo.Rules = {
   commentText: { match: /.+?/, lineBreaks: true }
 };
 
-export default () =>
-  moo.states({
-    main,
-    stringLiteral,
-    heredocLiteral,
-    interpolated,
-    lineComment,
-    blockComment
-  });
+export const rules = {
+  main,
+  stringLiteral,
+  heredocLiteral,
+  interpolated,
+  lineComment,
+  blockComment
+};
+
+export default () => moo.states(rules);
