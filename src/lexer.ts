@@ -22,7 +22,7 @@ export interface MooState {
 
 export interface Info {
   mooState: MooState;
-  mooStack: Array<any>;
+  mooStack: any[];
   heredocStack: HeredocState[];
   lastToken: Token | null;
 }
@@ -50,7 +50,7 @@ export default class HclLexer {
    *
    * @override
    */
-  save(): Info {
+  public save(): Info {
     return {
       mooState: this.moo.save(),
       mooStack: this.moo.stack,
@@ -64,7 +64,7 @@ export default class HclLexer {
    *
    * @override
    */
-  reset(chunk: string, info?: Info) {
+  public reset(chunk: string, info?: Info) {
     if (info) {
       const { mooState, mooStack, heredocStack } = info;
       this.heredocStack = heredocStack;
@@ -81,7 +81,7 @@ export default class HclLexer {
    *
    * @override
    */
-  next(): Token {
+  public next(): Token {
     if (this.heredocStack.length) {
       const text = this.moo.buffer.slice(this.moo.index);
       const heredoc = this.heredocStack[this.heredocStack.length - 1];
@@ -156,7 +156,7 @@ export default class HclLexer {
    *
    * @override
    */
-  formatError(token: Token) {
+  public formatError(token: Token) {
     return this.moo.formatError(token);
   }
 
@@ -165,7 +165,7 @@ export default class HclLexer {
    *
    * @override
    */
-  has(tokenType: string): boolean {
+  public has(tokenType: string): boolean {
     return tokenType === "endHeredoc" || this.moo.has(tokenType);
   }
 }

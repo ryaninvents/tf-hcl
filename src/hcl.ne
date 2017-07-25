@@ -1,6 +1,7 @@
 @preprocessor typescript
 
 @{%
+/* tslint:disable:curly */
 import HclLexer from './lexer';
 
 const lexer = new HclLexer();

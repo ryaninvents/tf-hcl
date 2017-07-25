@@ -2,5 +2,11 @@
   "extends": [
     "tslint:latest",
     "tslint-config-prettier"
-  ]
+  ],
+  "rules": {
+    "interface-name": false,
+    "object-literal-sort-keys": false,
+    "no-var-keyword": false,
+    "no-invalid-template-strings": false
+  }
 }
