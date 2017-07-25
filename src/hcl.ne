@@ -22,9 +22,9 @@ function asNode(type: string, func: (...args: any[]) => any): (...args: any[]) =
   return (data, location, reject) => {
     const node = func(data, location, reject);
     return {
-      ...node,
       type,
       location,
+      ...node,
     };
   };
 }
@@ -48,7 +48,7 @@ Declaration -> MemberDeclaration {% id %} | Assignment {% id %}
 # @example
 #     resource "aws_instance" "foo" {}
 MemberDeclaration ->
-  Identifier _ (Expression {% nth(0) %} | Declaration {% id %}) {%
+  Identifier ws (Expression {% nth(0) %} | Declaration {% id %}) {%
     asNode('MemberDeclaration', ([left, , right]) => ({ children: [left, right] }))
   %}
 
