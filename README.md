@@ -5,3 +5,9 @@
 # tf-hcl
 
 Hashicorp Config Language parsing/generating.
+
+## Dumping a syntax tree
+
+```bash
+npm run test:grammar < fixtures/decode_tf_variable.hcl
+```

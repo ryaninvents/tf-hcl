@@ -14,14 +14,15 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
-    "clean": "rimraf lib && rimraf coverage && rimraf .nyc_output && rimraf lib_test/src && rimraf 'lib_test/test/**/*-spec.js'",
+    "clean": "rimraf lib && rimraf coverage && rimraf .nyc_output && rimraf lib_test/src && rimraf 'lib_test/test/**/*-spec.js' && rimraf src/hcl.ne.ts",
     "prettier": "prettier --write \"{src,test}/**/*.ts\"",
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "prepublish": "npm run build",
     "prebuild": "npm run clean && npm run prettier && npm run lint && echo Using TypeScript && tsc --version",
-    "build": "npm run -s build:nearley && tsc --pretty",
+    "build": "rimraf src/hcl.ne.ts && npm run -s build:nearley && tsc --pretty",
     "build:nearley": "nearleyc --out src/hcl.ne.ts src/hcl.ne",
     "test": "npm run clean && npm run -s build:nearley && tsc -p tsconfig.test.json --pretty && nyc --exclude \"**/*-spec.js\" ava \"**/*-spec.js\" --verbose",
+    "test:grammar": "npm run -s build && nearley-test lib/hcl.ne.js",
     "coverage": "nyc report --reporter=lcov --reporter=text --reporter=html",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch"
