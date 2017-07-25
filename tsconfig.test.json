@@ -6,7 +6,11 @@
     "declaration": false,
     "noImplicitAny": true,
     "removeComments": true,
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "typeRoots": [
+      "./typings",
+      "./node_modules/@types"
+    ]
   },
   "include": [
     "test/**/*"

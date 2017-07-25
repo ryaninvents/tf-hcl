@@ -152,7 +152,7 @@ Primitive -> Boolean {% id %} | Number {% id %} | String {% id %}
 
 Boolean -> %boolean {% asTokenNode('Boolean') %}
 
-Number -> %baseTenNumber
+Number -> %baseTenNumber {% asTokenNode('Number') %}
 
 String -> StringLiteral {% id %} | TemplateString {% id %} # | Heredoc | IndentedHeredoc
 
