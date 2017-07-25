@@ -103,7 +103,7 @@ Declaration -> MemberDeclaration {% id %} | Assignment {% id %}
 # @example
 #     resource "aws_instance" "foo" {}
 MemberDeclaration ->
-  Key ws (Expression {% nth(0) %} | Declaration {% id %})
+  Key ws (Section {% nth(0) %} | Declaration {% id %})
   {%
     asNode('MemberDeclaration', ([left, , right]) => ({
       children: [left, right],
@@ -160,12 +160,12 @@ StringLiteral ->
   %beginString StringContent:? %endString
   {%
     asNode('StringLiteral', ([start, value, end]) => ({
-      value,
+      value: value.value,
       location: locationFromTokens(start, end),
     }))
   %}
 
-StringContent -> StringChar:+ {% ([d]) => join(d) %}
+StringContent -> StringChar:+ {% ([d]) => ({ type: 'Text', value: join(d) }) %}
 
 StringChar
   -> %stringChar {% asString %}

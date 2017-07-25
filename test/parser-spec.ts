@@ -39,9 +39,29 @@ test("Parser should read template strings", t => {
   );
 });
 
+test("Parser should read template strings containing some literal text", t => {
+  const parser = makeParser();
+  parser.feed('foo = "somePrefix ${bar("baz")} someSuffix"');
+  const [ast] = parser.results;
+  t.deepEqual(select(ast, "Assignment TemplateString Text"), [
+    { type: "Text", value: "somePrefix " },
+    { type: "Text", value: " someSuffix" }
+  ]);
+});
+
 test("Parser should read numeric assignments", t => {
   const parser = makeParser();
   parser.feed(BASIC_FIXTURE);
   const [ast] = parser.results;
   t.is(select(ast, 'Config Key[name="some_number"] + Number')[0].value, "42");
+});
+
+test("Parser should handle section definitions", t => {
+  const parser = makeParser();
+  parser.feed('resource "aws_instance" "foo" { name = "test-instance" }');
+  const [ast] = parser.results;
+  t.deepEqual(
+    select(ast, 'Section Key[name="name"] + StringLiteral')[0].value,
+    "test-instance"
+  );
 });
