@@ -9,9 +9,13 @@ const lexer = new HclLexer();
 
 function nil(): null { return null; }
 
-function asString(d: any[]): string {
-  return d.filter((el) => typeof el === 'string' || (el && typeof el.value === 'string'))
-    .map((el) => el.value || el)
+function hasValue(x: any): boolean {
+  return x && (typeof x.value === 'string');
+}
+
+function asString(d: (Token | Node)[]): string {
+  return d.filter(hasValue)
+    .map((el: Token | Text) => el.value)
     .join('');
 }
 
@@ -23,20 +27,14 @@ function flatten(d: any[][]): any[] {
   return d.reduce((a, b) => a.concat(b), []);
 }
 
-function join(d: string[]): string {
-  return d.join('');
-}
-
 type NodeCreator = (...args: any[]) => Node;
 
-function asNode(type: string = "$temp", func: (...args: any[]) => any): NodeCreator {
+function asNode(type: string, func: (...args: any[]) => any): NodeCreator {
   return (data, offset, reject) => {
     const node = func(data, offset, reject);
     return { type, ...node };
   };
 }
-
-const getValue = ([d]: Token[] | Text[]) => d.value;
 
 function mergeValue([t]: Token[] | Text[]): any {
   return {value: t.value};
