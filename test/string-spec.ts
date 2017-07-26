@@ -1,7 +1,7 @@
 import test from "ava";
 import makeParser from "../src/parser";
 import select = require("unist-util-select");
-import {loadFixture} from './util';
+import { loadFixture } from "./util";
 
 import { Text } from "../src/types";
 
@@ -59,7 +59,11 @@ EOT
 EOF
 `);
   const [ast] = parser.results;
-})
+  t.deepEqual(
+    select(ast, 'Config Heredoc Text')[0].value,
+    "EOS\nEOT\n"
+  );
+});
 
 test("Parser should read numeric assignments", t => {
   const parser = makeParser();
