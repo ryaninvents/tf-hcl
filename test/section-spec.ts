@@ -1,7 +1,7 @@
 import test from "ava";
 import makeParser from "../src/parser";
 import select = require("unist-util-select");
-import {loadFixture} from './util';
+import { loadFixture } from "./util";
 
 import { Text } from "../src/types";
 
