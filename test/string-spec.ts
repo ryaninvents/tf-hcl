@@ -6,6 +6,7 @@ import { loadFixture } from "./util";
 import { Text } from "../src/types";
 
 const BASIC_FIXTURE = loadFixture("basic.hcl");
+const INDENTED_HEREDOC = loadFixture("multiline-indented.hcl");
 
 test("Parser should read simple string assignments", t => {
   const parser = makeParser();
@@ -71,3 +72,10 @@ test("Parser should read numeric assignments", t => {
   const [ast] = parser.results;
   t.is(select(ast, 'Config Key[name="some_number"] + Number')[0].value, "42");
 });
+
+test("Indented heredoc strings", t => {
+  const parser = makeParser();
+  parser.feed(INDENTED_HEREDOC);
+  const [ast] = parser.results;
+  t.is(select(ast, 'IndentedHeredoc').length, 1);
+})

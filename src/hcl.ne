@@ -172,7 +172,7 @@ Boolean -> %boolean {% asTokenNode('Boolean') %}
 
 Number -> %baseTenNumber {% asTokenNode('Number') %}
 
-String -> StringLiteral {% id %} | TemplateString {% id %} | Heredoc {% id %} # | IndentedHeredoc {% id %}
+String -> StringLiteral {% id %} | TemplateString {% id %} | Heredoc {% id %} | IndentedHeredoc {% id %}
 
 StringLiteral ->
   %beginString StringContent:? %endString
@@ -217,6 +217,21 @@ Heredoc ->
   ):* %endHeredoc
   {%
     asNode('Heredoc', ([beginString, first, rest, endString]) => ({
+      indented: false,
+      tag: beginString.tag,
+      children: [first].concat(flatten(rest)),
+      position: locationFromTokens(beginString, endString),
+    }))
+  %}
+
+
+IndentedHeredoc ->
+  %beginIndentedHeredoc HeredocContent:? (
+    Interpolation HeredocContent:? {% ([interp, content]) => content ? [interp, content] : [interp] %}
+  ):* %endHeredoc
+  {%
+    asNode('IndentedHeredoc', ([beginString, first, rest, endString]) => ({
+      indented: true,
       tag: beginString.tag,
       children: [first].concat(flatten(rest)),
       position: locationFromTokens(beginString, endString),
