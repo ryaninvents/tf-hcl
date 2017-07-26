@@ -118,7 +118,7 @@ export default class HclLexer {
             };
           }
         } else {
-          const match = text.match(getRegexForIndentedHeredoc(heredoc.tag));
+          const match = text.match(getRegexForHeredoc(heredoc.tag));
           if (match) {
             const size = match[0].length;
             this.moo.index += size;
