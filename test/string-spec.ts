@@ -56,13 +56,3 @@ test("Parser should read numeric assignments", t => {
   const [ast] = parser.results;
   t.is(select(ast, 'Config Key[name="some_number"] + Number')[0].value, "42");
 });
-
-test("Parser should handle section definitions", t => {
-  const parser = makeParser();
-  parser.feed('resource "aws_instance" "foo" { name = "test-instance" }');
-  const [ast] = parser.results;
-  t.deepEqual(
-    select(ast, 'Section Key[name="name"] + StringLiteral')[0].value,
-    "test-instance"
-  );
-});
