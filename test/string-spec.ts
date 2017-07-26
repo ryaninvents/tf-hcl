@@ -50,6 +50,17 @@ test("Parser should read template strings containing some literal text", t => {
   );
 });
 
+test("No false-positive matches on heredoc end", t => {
+  const parser = makeParser();
+  parser.feed(`
+myHeredoc = <<EOF
+EOS
+EOT
+EOF
+`);
+  const [ast] = parser.results;
+})
+
 test("Parser should read numeric assignments", t => {
   const parser = makeParser();
   parser.feed(BASIC_FIXTURE);
