@@ -6,7 +6,11 @@ import * as moo from "moo";
 const main: moo.Rules = {
   beginLineComment: { match: ["#", "//"], push: "lineComment" },
   beginBlockComment: { match: "/*", push: "blockComment" },
-  beginHeredoc: { match: /<<[A-Za-z0-9_]+\n/, lineBreaks: true, push: "heredocLiteral" },
+  beginHeredoc: {
+    match: /<<[A-Za-z0-9_]+\n/,
+    lineBreaks: true,
+    push: "heredocLiteral"
+  },
   beginIndentedHeredoc: {
     match: /<<-[A-Za-z0-9_]+\n/,
     lineBreaks: true,

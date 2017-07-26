@@ -60,10 +60,7 @@ EOT
 EOF
 `);
   const [ast] = parser.results;
-  t.deepEqual(
-    select(ast, 'Config Heredoc Text')[0].value,
-    "EOS\nEOT\n"
-  );
+  t.deepEqual(select(ast, "Config Heredoc Text")[0].value, "EOS\nEOT\n");
 });
 
 test("Parser should read numeric assignments", t => {
@@ -77,5 +74,5 @@ test("Indented heredoc strings", t => {
   const parser = makeParser();
   parser.feed(INDENTED_HEREDOC);
   const [ast] = parser.results;
-  t.is(select(ast, 'IndentedHeredoc').length, 1);
-})
+  t.is(select(ast, "IndentedHeredoc").length, 1);
+});
