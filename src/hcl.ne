@@ -3,6 +3,7 @@
 @{%
 /* tslint:disable:curly */
 import HclLexer, {Token} from './lexer';
+import {Node, Location, Position, Parent, Text} from './types';
 
 const lexer = new HclLexer();
 
@@ -26,21 +27,22 @@ function join(d: string[]): string {
   return d.join('');
 }
 
-function asNode(type: string, func: (...args: any[]) => any): (...args: any[]) => any {
+type NodeCreator = (...args: any[]) => Node;
+
+function asNode(type: string = '$temp', func: (...args: any[]) => object): NodeCreator {
   return (data, offset, reject) => {
     const node = func(data, offset, reject);
-    return {
-      type,
-      ...node,
-    };
+    return Object.assign({type}, node);
   };
 }
 
-function mergeValue([t]: Token[]): any {
-  return {value: t.value};
+const getValue = ([d]: Token[] | Text[]) => d.value;
+
+function mergeValue([t]: Token[] | Text[]): any {
+  return {type: '$temp', value: t.value};
 }
 
-function locationFromToken(token: Token) {
+function locationFromToken(token: Token): Location {
     const {line, col: column, lineBreaks, size, value, offset} = token;
     if (lineBreaks === 0) {
       return {
@@ -63,21 +65,37 @@ function locationFromToken(token: Token) {
     }
 }
 
-function locationFromTokens(first: Token, last: Token) {
+function locationFromTokens(first: Token, last: Token): Location {
   const start = locationFromToken(first).start;
   const end = locationFromToken(last).end;
   return {start, end};
 }
 
-function asTokenNode(type: string, func: (...args: any[]) => any = mergeValue): (...args: any[]) => any {
+function asTokenNode(type?: string, func: (...args: any[]) => object = mergeValue): (...args: any[]) => Node {
   return asNode(type, (data, offset, reject) => {
     const [token] = data;
     return {
       ...func(data, offset, reject),
-      location: locationFromToken(token),
+      position: locationFromToken(token),
     };
   });
 }
+
+const textNode = asNode('Text', ([d]: Node[][]) => {
+  const value = asString(d);
+  const [first] = d;
+  if (d.length === 1) {
+    return { value, position: first.position };
+  }
+  const last = d[d.length - 1];
+  return {
+    value: asString(d),
+    position: {
+      start: first.position.start,
+      end: last.position.end,
+    },
+  };
+});
 
 %}
 
@@ -107,9 +125,9 @@ MemberDeclaration ->
   {%
     asNode('MemberDeclaration', ([left, , right]) => ({
       children: [left, right],
-      location: {
-        start: left.location.start,
-        end: right.location.end,
+      position: {
+        start: left.position.start,
+        end: right.position.end,
       },
     }))
   %}
@@ -122,9 +140,9 @@ Assignment ->
   {%
     asNode('Assignment', ([left, , , , right]) => ({
       children: [left, right],
-      location: {
-        start: left.location.start,
-        end: right.location.end,
+      position: {
+        start: left.position.start,
+        end: right.position.end,
       },
     }))
   %}
@@ -136,12 +154,12 @@ Section ->
   {%
     asNode('Section', ([openBrace,,children, closeBrace]) => ({
       children,
-      location: locationFromTokens(openBrace, closeBrace),
+      position: locationFromTokens(openBrace, closeBrace),
     }))
   %}
 
-Key -> Identifier {% asNode('Key', ([d]) => ({ name: d.value, children: [d], location: d.location })) %}
-  | StringLiteral {% asNode('Key', ([d]) => ({ name: d, children: [d], location: d.location })) %}
+Key -> Identifier {% asNode('Key', ([d]) => ({ name: d.value, children: [d], position: d.position })) %}
+  | StringLiteral {% asNode('Key', ([d]) => ({ name: d, children: [d], position: d.position })) %}
 
 Identifier -> %identifier {% asTokenNode('Identifier', ([d]: Token[]) => ({value: d.value})) %}
 
@@ -154,23 +172,25 @@ Boolean -> %boolean {% asTokenNode('Boolean') %}
 
 Number -> %baseTenNumber {% asTokenNode('Number') %}
 
-String -> StringLiteral {% id %} | TemplateString {% id %} # | Heredoc | IndentedHeredoc
+String -> StringLiteral {% id %} | TemplateString {% id %} | Heredoc {% id %} # | IndentedHeredoc {% id %}
 
 StringLiteral ->
   %beginString StringContent:? %endString
   {%
     asNode('StringLiteral', ([start, value, end]) => ({
       value: value.value,
-      location: locationFromTokens(start, end),
+      position: locationFromTokens(start, end),
     }))
   %}
 
-StringContent -> StringChar:+ {% ([d]) => ({ type: 'Text', value: join(d) }) %}
+StringContent -> StringChar:+ {% textNode %}
+
+HeredocContent -> (%heredocChar {% asTokenNode() %} | %newline {% asTokenNode() %} ):+ {% textNode %}
 
 StringChar
-  -> %stringChar {% asString %}
-  | %newline {% asString %}
-  | %escapedDollar {% asString %}
+  -> %stringChar {% asTokenNode() %}
+  | %newline {% asTokenNode() %}
+  | %escapedDollar {% asTokenNode() %}
 
 TemplateString ->
   %beginString (
@@ -187,7 +207,19 @@ TemplateString ->
   {%
     asNode('TemplateString', ([beginString, startContents, endContents, endString]) => ({
       children: flatten(startContents).concat(endContents ? [endContents] : []),
-      location: locationFromTokens(beginString, endString),
+      position: locationFromTokens(beginString, endString),
+    }))
+  %}
+
+Heredoc ->
+  %beginHeredoc HeredocContent:? (
+    Interpolation HeredocContent:? {% ([interp, content]) => content ? [interp, content] : [interp] %}
+  ):* %endHeredoc
+  {%
+    asNode('Heredoc', ([beginString, first, rest, endString]) => ({
+      tag: beginString.tag,
+      children: [first].concat(flatten(rest)),
+      position: locationFromTokens(beginString, endString),
     }))
   %}
 
@@ -196,7 +228,7 @@ Interpolation ->
   {%
     asNode('Interpolation', ([beginInterp, , expression, , endInterp]) => ({
       children: [expression],
-      location: locationFromTokens(beginInterp, endInterp),
+      position: locationFromTokens(beginInterp, endInterp),
     }))
   %}
 
@@ -210,8 +242,8 @@ FunctionCall ->
     asNode('FunctionCall', ([funcName,,,arg,,closeParen]) => ({
       name: funcName.value,
       children: [arg],
-      location: {
-        start: funcName.location.start,
+      position: {
+        start: funcName.position.start,
         end: locationFromToken(closeParen).end,
       },
     }))

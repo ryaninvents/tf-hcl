@@ -33,7 +33,7 @@ const heredocLiteral: moo.Rules = {
   escapedDollar: { match: "$$" },
   newline: { match: "\n", lineBreaks: true },
   beginInterpolation: { match: "${", push: "interpolated" },
-  stringChar: { match: /.+?/, lineBreaks: false }
+  heredocChar: { match: /[^\n]+?/, lineBreaks: false }
 };
 
 /**
