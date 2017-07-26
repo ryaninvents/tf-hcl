@@ -101,7 +101,8 @@ export default class HclLexer {
         if (heredoc.indented) {
           const match = text.match(getRegexForIndentedHeredoc(heredoc.tag));
           if (match) {
-            this.moo.index += match[0].length;
+            const size = match[0].length;
+            this.moo.index += size;
             this.moo.popState();
             this.heredocStack.pop();
             this.moo.line++;
@@ -113,13 +114,14 @@ export default class HclLexer {
               col,
               offset,
               lineBreaks: 0,
-              size: match[0].length
+              size
             };
           }
         } else {
           const match = text.match(getRegexForIndentedHeredoc(heredoc.tag));
           if (match) {
-            this.moo.index += match[0].length;
+            const size = match[0].length;
+            this.moo.index += size;
             this.moo.popState();
             this.heredocStack.pop();
             this.moo.line++;
@@ -131,7 +133,7 @@ export default class HclLexer {
               col,
               offset,
               lineBreaks: 0,
-              size: match[0].length
+              size
             };
           }
         }

@@ -29,17 +29,17 @@ function join(d: string[]): string {
 
 type NodeCreator = (...args: any[]) => Node;
 
-function asNode(type: string = '$temp', func: (...args: any[]) => object): NodeCreator {
+function asNode(type: string = "$temp", func: (...args: any[]) => any): NodeCreator {
   return (data, offset, reject) => {
     const node = func(data, offset, reject);
-    return Object.assign({type}, node);
+    return { type, ...node };
   };
 }
 
 const getValue = ([d]: Token[] | Text[]) => d.value;
 
 function mergeValue([t]: Token[] | Text[]): any {
-  return {type: '$temp', value: t.value};
+  return {value: t.value};
 }
 
 function locationFromToken(token: Token): Location {
@@ -71,7 +71,7 @@ function locationFromTokens(first: Token, last: Token): Location {
   return {start, end};
 }
 
-function asTokenNode(type?: string, func: (...args: any[]) => object = mergeValue): (...args: any[]) => Node {
+function asTokenNode(type: string = '$token', func: (...args: any[]) => object = mergeValue): (...args: any[]) => Node {
   return asNode(type, (data, offset, reject) => {
     const [token] = data;
     return {

@@ -57,7 +57,7 @@ more_content = true
       ["identifier", "mumble"],
       ["equal", "="],
       ["beginHeredoc", "<<EOF\n"],
-      ...stringChars("foo bar "),
+      ...stringChars("foo bar ", "heredocChar"),
       ["beginInterpolation", "${"],
       ["identifier", "baz"],
       ["openParen", "("],
@@ -67,7 +67,7 @@ more_content = true
       ["closeParen", ")"],
       ["endInterpolation", "}"],
       ["newline", "\n"],
-      ["endHeredoc", "EOF\n"],
+      ["endHeredoc", "EOF"],
       ["identifier", "more_content"],
       ["equal", "="],
       ["boolean", "true"]

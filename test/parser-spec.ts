@@ -4,6 +4,8 @@ import path = require("path");
 import fs = require("fs");
 import select = require("unist-util-select");
 
+import { Text } from "../src/types";
+
 function loadFixture(fnm: string): string {
   return fs
     .readFileSync(path.resolve(__dirname, path.join("../../fixtures", fnm)))
@@ -43,10 +45,16 @@ test("Parser should read template strings containing some literal text", t => {
   const parser = makeParser();
   parser.feed('foo = "somePrefix ${bar("baz")} someSuffix"');
   const [ast] = parser.results;
-  t.deepEqual(select(ast, "Assignment TemplateString Text"), [
-    { type: "Text", value: "somePrefix " },
-    { type: "Text", value: " someSuffix" }
-  ]);
+  t.deepEqual(
+    (select(
+      ast,
+      "Assignment TemplateString Text"
+    ) as Text[]).map(({ type, value }) => ({ type, value })),
+    [
+      { type: "Text", value: "somePrefix " },
+      { type: "Text", value: " someSuffix" }
+    ]
+  );
 });
 
 test("Parser should read numeric assignments", t => {
