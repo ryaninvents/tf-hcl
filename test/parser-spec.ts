@@ -1,16 +1,9 @@
 import test from "ava";
 import makeParser from "../src/parser";
-import path = require("path");
-import fs = require("fs");
 import select = require("unist-util-select");
+import {loadFixture} from './util';
 
 import { Text } from "../src/types";
-
-function loadFixture(fnm: string): string {
-  return fs
-    .readFileSync(path.resolve(__dirname, path.join("../../fixtures", fnm)))
-    .toString();
-}
 
 const BASIC_FIXTURE = loadFixture("basic.hcl");
 
