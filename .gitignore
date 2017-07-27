@@ -4,7 +4,7 @@ npm-debug.log
 .nyc_output
 /lib
 /lib_test/src
-/lib_test/test/**/*-spec.js
+/lib_test/test/**/*.spec.js
 /lib_test/test/util.js
 /package-lock.json
 
