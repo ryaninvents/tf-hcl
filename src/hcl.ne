@@ -217,7 +217,7 @@ Heredoc ->
     asNode('Heredoc', ([beginString, first, rest, endString]) => ({
       indented: false,
       tag: beginString.tag,
-      children: [first].concat(flatten(rest)),
+      children: (first ? [first] : []).concat(flatten(rest)),
       position: locationFromTokens(beginString, endString),
     }))
   %}

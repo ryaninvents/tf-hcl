@@ -51,6 +51,19 @@ test("Parser should read template strings containing some literal text", t => {
   );
 });
 
+test("Parser should read template strings containing multiple interpolations", t => {
+  const parser = makeParser();
+  parser.feed('foo = "somePrefix ${bar("baz")}${"quux"} other text ${"mumble"} someSuffix"');
+  const [ast] = parser.results;
+  t.deepEqual(
+    select(
+      ast,
+      "Assignment TemplateString Interpolation"
+    ).length,
+    3
+  );
+});
+
 test("No false-positive matches on heredoc end", t => {
   const parser = makeParser();
   parser.feed(`
@@ -62,6 +75,44 @@ EOF
   const [ast] = parser.results;
   t.deepEqual(select(ast, "Config Heredoc Text")[0].value, "EOS\nEOT\n");
 });
+
+test("Should read multiple interpolations in a heredoc", t => {
+  const parser = makeParser();
+  parser.feed(`
+myHeredoc = <<EOF
+\${bar("baz")}\${"quux"}
+other text
+\${"mumble"}
+EOF
+`);
+  const [ast] = parser.results;
+  t.deepEqual(
+    select(
+      ast,
+      "Heredoc Interpolation"
+    ).length,
+    3
+  );
+})
+
+test("Should read multiple interpolations in an indented heredoc", t => {
+  const parser = makeParser();
+  parser.feed(`
+myHeredoc = <<-EOF
+            \${bar("baz")}\${"quux"}
+            other text
+            \${"mumble"}
+            EOF
+`);
+  const [ast] = parser.results;
+  t.deepEqual(
+    select(
+      ast,
+      "IndentedHeredoc Interpolation"
+    ).length,
+    3
+  );
+})
 
 test("Parser should read numeric assignments", t => {
   const parser = makeParser();
