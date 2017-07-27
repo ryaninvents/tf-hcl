@@ -1,18 +1,18 @@
-import HclLexer, {Token} from './lexer';
-import {Node, Location, Position, Parent, Text} from './types';
+import HclLexer, { Token } from "./lexer";
+import { Node, Location, Position, Parent, Text } from "./types";
 
 export const lexer = new HclLexer();
 
-export function nil(): null { return null; }
+export function nil(): null {
+  return null;
+}
 
 export function hasValue(x: any): boolean {
-  return x && (typeof x.value === 'string');
+  return x && typeof x.value === "string";
 }
 
 export function asString(d: (Token | Node)[]): string {
-  return d.filter(hasValue)
-    .map((el: Token | Text) => el.value)
-    .join('');
+  return d.filter(hasValue).map((el: Token | Text) => el.value).join("");
 }
 
 export function nth(i: number) {
@@ -25,7 +25,10 @@ export function flatten(d: any[][]): any[] {
 
 export type NodeCreator = (...args: any[]) => Node;
 
-export function asNode(type: string, func: (...args: any[]) => any): NodeCreator {
+export function asNode(
+  type: string,
+  func: (...args: any[]) => any
+): NodeCreator {
   return (data, offset, reject) => {
     const node = func(data, offset, reject);
     return { type, ...node };
@@ -33,49 +36,52 @@ export function asNode(type: string, func: (...args: any[]) => any): NodeCreator
 }
 
 function mergeValue([t]: Token[] | Text[]): any {
-  return {value: t.value};
+  return { value: t.value };
 }
 
 export function locationFromToken(token: Token): Location {
-    const {line, col: column, lineBreaks, size, value, offset} = token;
-    if (lineBreaks === 0) {
-      return {
-        start: {line, column, offset},
-        end: {
-          line,
-          column: column + size,
-          offset: offset + size,
-        },
-      };
-    } else {
-      return {
-        start: {line, column, offset},
-        end: {
-          line: line + lineBreaks,
-          column: value.length - value.lastIndexOf('\n'),
-          offset: offset + size,
-        },
-      };
-    }
+  const { line, col: column, lineBreaks, size, value, offset } = token;
+  if (lineBreaks === 0) {
+    return {
+      start: { line, column, offset },
+      end: {
+        line,
+        column: column + size,
+        offset: offset + size
+      }
+    };
+  } else {
+    return {
+      start: { line, column, offset },
+      end: {
+        line: line + lineBreaks,
+        column: value.length - value.lastIndexOf("\n"),
+        offset: offset + size
+      }
+    };
+  }
 }
 
 export function locationFromTokens(first: Token, last: Token): Location {
   const start = locationFromToken(first).start;
   const end = locationFromToken(last).end;
-  return {start, end};
+  return { start, end };
 }
 
-export function asTokenNode(type: string = '$token', func: (...args: any[]) => object = mergeValue): (...args: any[]) => Node {
+export function asTokenNode(
+  type: string = "$token",
+  func: (...args: any[]) => object = mergeValue
+): (...args: any[]) => Node {
   return asNode(type, (data, offset, reject) => {
     const [token] = data;
     return {
       ...func(data, offset, reject),
-      position: locationFromToken(token),
+      position: locationFromToken(token)
     };
   });
 }
 
-export const textNode = asNode('Text', ([d]: Node[][]) => {
+export const textNode = asNode("Text", ([d]: Node[][]) => {
   const value = asString(d);
   const [first] = d;
   if (d.length === 1) {
@@ -86,8 +92,7 @@ export const textNode = asNode('Text', ([d]: Node[][]) => {
     value: asString(d),
     position: {
       start: first.position.start,
-      end: last.position.end,
-    },
+      end: last.position.end
+    }
   };
 });
-

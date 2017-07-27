@@ -15,7 +15,6 @@ test("Parser should handle section definitions", t => {
   );
 });
 
-
 test("Parser should handle multiple section definitions", t => {
   const parser = makeParser();
   parser.feed(`
