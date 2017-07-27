@@ -11,7 +11,7 @@ export function hasValue(x: any): boolean {
   return x && typeof x.value === "string";
 }
 
-export function asString(d: (Token | Node)[]): string {
+export function asString(d: Array<Token | Node>): string {
   return d.filter(hasValue).map((el: Token | Text) => el.value).join("");
 }
 
