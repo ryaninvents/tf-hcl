@@ -85,7 +85,9 @@ Primitive -> Boolean {% id %} | Number {% id %} | String {% id %}
 
 Boolean -> %boolean {% asTokenNode('Boolean') %}
 
-Number -> %baseTenNumber {% asTokenNode('Number') %}
+Number -> %baseTenNumber {% asTokenNode('Number', ([{value}]) => ({value, base: 10})) %}
+  | %hexadecimalNumber {% asTokenNode('Number', ([{value}]) => ({value, base: 16})) %}
+  | %octalNumber {% asTokenNode('Number', ([{value}]) => ({value, base: 8})) %}
 
 String -> StringLiteral {% id %} | TemplateString {% id %} | Heredoc {% id %} | IndentedHeredoc {% id %}
 

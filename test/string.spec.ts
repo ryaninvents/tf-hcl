@@ -98,13 +98,6 @@ myHeredoc = <<-EOF
   t.deepEqual(select(ast, "IndentedHeredoc Interpolation").length, 3);
 });
 
-test("Parser should read numeric assignments", t => {
-  const parser = makeParser();
-  parser.feed(BASIC_FIXTURE);
-  const [ast] = parser.results;
-  t.is(select(ast, 'Config Key[name="some_number"] + Number')[0].value, "42");
-});
-
 test("Indented heredoc strings", t => {
   const parser = makeParser();
   parser.feed(INDENTED_HEREDOC);

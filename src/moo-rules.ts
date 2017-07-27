@@ -19,6 +19,8 @@ const main: moo.Rules = {
   beginString: { match: '"', push: "stringLiteral" },
 
   baseTenNumber: /-?(?:[0-9]|[1-9][0-9]+)(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?\b/,
+  hexadecimalNumber: /-?0[Xx](?:[0-9A-Fa-f]+)\b/,
+  octalNumber: /-?0(?:[0-7]+)\b/,
   boolean: ["true", "on", "yes", "false", "off", "no"],
   identifier: /[A-Za-z_][A-Za-z0-9_-]*/,
   openBrace: "{",
