@@ -14,3 +14,20 @@ test("Parser should handle section definitions", t => {
     "test-instance"
   );
 });
+
+
+test("Parser should handle multiple section definitions", t => {
+  const parser = makeParser();
+  parser.feed(`
+// AWS instance
+resource "aws_instance" "foo" { name = "test-instance" }
+
+// DNS
+resource "aws_route53_route" "domain" {}
+
+// Null resource
+resource "null_resource" "bar" {}
+`);
+  const [ast] = parser.results;
+  t.is(ast.children.length, 3);
+});

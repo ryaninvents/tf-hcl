@@ -109,7 +109,11 @@ Config -> _ Declarations:? _ {% asNode('Config', ([, children]) => ({ children }
 Declarations ->
   Declaration (_ Declaration {% nth(1) %} ):*
   {%
-    ([first, rest]) => rest ? [first].concat(rest) : [first]
+    ([first, rest]) => (
+      rest
+        ? [first].concat(rest)
+        : [first]
+    )
   %}
 
 # A declaration can be either a member declaration or an assignment.
@@ -266,7 +270,7 @@ FunctionCall ->
 Equals -> %equal
 
 # ## Whitespace and comments
-_ -> ws:? {% nil %}
+_ -> ws:* {% nil %}
 ws -> (%ws | LineComment | BlockComment) {% nil %}
 
 LineComment -> %beginLineComment %commentText:* %endComment
