@@ -5,7 +5,7 @@
 import {
   lexer, nil, hasValue, asString, nth, flatten,
   asNode, locationFromToken, locationFromTokens,
-  asTokenNode, textNode
+  asTokenNode, textNode, parseInt
 } from './parser-util';
 
 %}
@@ -85,9 +85,9 @@ Primitive -> Boolean {% id %} | Number {% id %} | String {% id %}
 
 Boolean -> %boolean {% asTokenNode('Boolean') %}
 
-Number -> %baseTenNumber {% asTokenNode('Number', ([{value}]) => ({value, base: 10})) %}
-  | %hexadecimalNumber {% asTokenNode('Number', ([{value}]) => ({value, base: 16})) %}
-  | %octalNumber {% asTokenNode('Number', ([{value}]) => ({value, base: 8})) %}
+Number -> %baseTenNumber {% asTokenNode('Number', ([{value}]) => ({rawValue: value, value: Number(value), base: 10})) %}
+  | %hexadecimalNumber {% asTokenNode('Number', ([{value}]) => ({rawValue: value, value: parseInt(value.slice(2), 16), base: 16})) %}
+  | %octalNumber {% asTokenNode('Number', ([{value}]) => ({rawValue: value, value: parseInt(value.slice(1), 8), base: 8})) %}
 
 String -> StringLiteral {% id %} | TemplateString {% id %} | Heredoc {% id %} | IndentedHeredoc {% id %}
 

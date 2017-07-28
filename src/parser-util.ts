@@ -96,3 +96,7 @@ export const textNode = asNode("Text", ([d]: Node[][]) => {
     }
   };
 });
+
+export function parseInt(value: string, radix?: number) {
+  return (Number as any).parseInt(value, radix);
+}

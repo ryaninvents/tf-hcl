@@ -13,7 +13,8 @@ test("base-10 numbers", t => {
   const [ast] = parser.results;
 
   const node = select(ast, 'Key[name="my_number"] + Number')[0];
-  t.is(node.value, "42.356");
+  t.is(node.rawValue, "42.356");
+  t.is(node.value, 42.356);
   t.is(node.base, 10);
 });
 
@@ -23,7 +24,8 @@ test("hexadecimal numbers", t => {
   const [ast] = parser.results;
 
   const node = select(ast, 'Key[name="my_number"] + Number')[0];
-  t.is(node.value, "0x99BEEF");
+  t.is(node.rawValue, "0x99BEEF");
+  t.is(node.value, 0x99BEEF);
   t.is(node.base, 16);
 });
 
@@ -33,7 +35,8 @@ test("octal numbers", t => {
   const [ast] = parser.results;
 
   const node = select(ast, 'Key[name="permissions"] + Number')[0];
-  t.is(node.value, "0777");
+  t.is(node.rawValue, "0777");
+  t.is(node.value, 0o777);
   t.is(node.base, 8);
 });
 

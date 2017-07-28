@@ -43,7 +43,7 @@
     "rimraf": "^2.0.0",
     "tslint": "^5.0.0",
     "tslint-config-prettier": "^1.1.0",
-    "typescript": "^2.0.0",
+    "typescript": "^2.4.2",
     "unist-util-select": "^1.5.0"
   },
   "engines": {
@@ -55,6 +55,9 @@
     ]
   },
   "nyc": {
-    "exclude": ["lib_test/test/**", "**/*.ne.js"]
+    "exclude": [
+      "lib_test/test/**",
+      "**/*.ne.js"
+    ]
   }
 }
