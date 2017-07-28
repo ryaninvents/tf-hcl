@@ -26,6 +26,7 @@ const main: moo.Rules = {
   openBrace: "{",
   closeBrace: "}",
   dot: ".",
+  comma: ",",
   equal: "=",
   ws: { match: /\s+/, lineBreaks: true }
 };

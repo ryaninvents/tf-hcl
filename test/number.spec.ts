@@ -25,7 +25,7 @@ test("hexadecimal numbers", t => {
 
   const node = select(ast, 'Key[name="my_number"] + Number')[0];
   t.is(node.rawValue, "0x99BEEF");
-  t.is(node.value, 0x99BEEF);
+  t.is(node.value, 0x99beef);
   t.is(node.base, 16);
 });
 

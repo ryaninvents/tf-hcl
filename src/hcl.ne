@@ -165,21 +165,57 @@ Interpolation ->
   %}
 
 InterpolatedExpression
+  -> SimpleInterpolatedExpr {% id %}
+   | Sum {% id %}
+
+SimpleInterpolatedExpr
   -> FunctionCall {% id %}
-  | Primitive {% id %}
+   | Primitive {% id %}
+   | Identifier {% id %}
+   | ParenExpr {% id %}
+
+Sum
+  -> Sum _ (%plus {% id %} | %minus {% id %}) _ Product
+     {% asNode('BinaryExpression', ([first, , op, , rest]) => ({
+       operator: op.value,
+       children: [first, rest],
+       position: {
+         start: first.position.start,
+         end: rest.position.end,
+       }
+     })) %}
+   | Product {% id %}
+
+Product
+  -> Product _ (%star {% asTokenNode() %} | %slash {% asTokenNode() %} | %modulo {% asTokenNode() %}) _ SimpleInterpolatedExpr
+     {% asNode('BinaryExpression', ([first, , op, , rest]) => ({
+       operator: op.value,
+       children: [first, rest],
+       position: {
+         start: first.position.start,
+         end: rest.position.end,
+       }
+     })) %}
+   | SimpleInterpolatedExpr {% id %}
+
+ParenExpr -> %openParen _ InterpolatedExpression _ %closeParen {% nth(2) %}
 
 FunctionCall ->
-  Identifier %openParen _ InterpolatedExpression _ %closeParen
+  Identifier %openParen _ FunctionArgs _ %closeParen
   {%
-    asNode('FunctionCall', ([funcName,,,arg,,closeParen]) => ({
+    asNode('FunctionCall', ([funcName,,,args,,closeParen]) => ({
       name: funcName.value,
-      children: [arg],
+      children: args,
       position: {
         start: funcName.position.start,
         end: locationFromToken(closeParen).end,
       },
     }))
   %}
+
+FunctionArgs ->
+  InterpolatedExpression (_ %comma _ InterpolatedExpression {% nth(3) %}):*
+  {% ([first, rest]) => (rest ? [first].concat(rest) : [first]) %}
 
 # ## Tokens
 Equals -> %equal
