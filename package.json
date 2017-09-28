@@ -53,7 +53,7 @@
   },
   "release": {
     "branch": "develop",
-    "analyze-commits": {
+    "analyzeCommits": {
       "preset": "eslint"
     }
   },
