@@ -42,14 +42,20 @@
     "nyc": "^10.0.0",
     "prettier": "^1.5.2",
     "rimraf": "^2.0.0",
+    "semantic-release": "^8.0.3",
     "semantic-release-cli": "^3.2.0",
     "tslint": "^5.0.0",
     "tslint-config-prettier": "^1.1.0",
     "typescript": "^2.4.2",
     "unist-util-inspect": "^4.1.1",
     "unist-util-remove-position": "^1.1.1",
-    "unist-util-select": "^1.5.0",
-    "semantic-release": "^8.0.3"
+    "unist-util-select": "^1.5.0"
+  },
+  "release": {
+    "branch": "develop",
+    "analyze-commits": {
+      "preset": "eslint"
+    }
   },
   "engines": {
     "node": ">=6.0.0"

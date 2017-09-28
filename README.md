@@ -28,3 +28,7 @@ const results = parser.results[0];
 ```
 
 AST follows the [Unist](https://github.com/syntax-tree/unist) schema but is otherwise undocumented. See [the test snapshots](./lib_test/test/snapshots/interpolated-expressions.spec.js.md) or read [the tests](./test) for details; I'll document these once the whole library is stable.
+
+## Contributing
+
+This project uses [ESLint-style commit messages](https://github.com/conventional-changelog/conventional-changelog/blob/master/packages/conventional-changelog-eslint/convention.md).
