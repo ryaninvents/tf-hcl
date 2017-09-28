@@ -1,6 +1,6 @@
 {
   "name": "tf-hcl",
-  "version": "0.0.0",
+  "version": "0.0.0-development",
   "description": "tf-hcl",
   "license": "MIT",
   "repository": "https://github.com/r24y/tf-hcl.git",
@@ -25,7 +25,8 @@
     "test:grammar": "npm run -s build && nearley-test lib/hcl.ne.js",
     "coverage": "nyc report --reporter=lcov --reporter=text --reporter=html",
     "watch": "npm run build -- --watch",
-    "watch:test": "npm run test -- --watch"
+    "watch:test": "npm run test -- --watch",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
     "moo": "^0.3.3",
@@ -41,12 +42,14 @@
     "nyc": "^10.0.0",
     "prettier": "^1.5.2",
     "rimraf": "^2.0.0",
+    "semantic-release-cli": "^3.2.0",
     "tslint": "^5.0.0",
     "tslint-config-prettier": "^1.1.0",
     "typescript": "^2.4.2",
     "unist-util-inspect": "^4.1.1",
     "unist-util-remove-position": "^1.1.1",
-    "unist-util-select": "^1.5.0"
+    "unist-util-select": "^1.5.0",
+    "semantic-release": "^8.0.3"
   },
   "engines": {
     "node": ">=6.0.0"
