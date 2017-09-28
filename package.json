@@ -1,6 +1,6 @@
 {
   "name": "tf-hcl",
-  "version": "0.0.0-development",
+  "version": "0.0.0",
   "description": "tf-hcl",
   "license": "MIT",
   "repository": "https://github.com/r24y/tf-hcl.git",
