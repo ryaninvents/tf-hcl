@@ -10,5 +10,8 @@ test("should handle variable names containing hyphens", t => {
   parser.feed('my_value = "${some-important-value - some-other-value}"');
   const ast = parser.results[0];
 
-  t.snapshot((inspect as any).noColor(ast), 'subtraction of two variables containing hyphens');
+  t.snapshot(
+    (inspect as any).noColor(ast),
+    "subtraction of two variables containing hyphens"
+  );
 });

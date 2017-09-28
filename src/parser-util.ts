@@ -12,7 +12,10 @@ export function hasValue(x: any): boolean {
 }
 
 export function asString(d: Array<Token | Node>): string {
-  return d.filter(hasValue).map((el: Token | Text) => el.value).join("");
+  return d
+    .filter(hasValue)
+    .map((el: Token | Text) => el.value)
+    .join("");
 }
 
 export function nth(i: number) {
