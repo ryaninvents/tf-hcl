@@ -62,7 +62,7 @@ Assignment ->
     }))
   %}
 
-Expression -> Section {% id %} | Primitive {% id %}
+Expression -> Section {% id %} | List {% id %} | Primitive {% id %}
 
 Section ->
   %openBrace _ (Declarations _ {% nth(0) %} ):? %closeBrace
@@ -72,6 +72,26 @@ Section ->
       position: locationFromTokens(openBrace, closeBrace),
     }))
   %}
+
+List -> %openSqBrace _ (ListContents _ {% nth(0) %} ):? %closeSqBrace
+  {%
+    asNode('List', ([openBrace, , contents, closeBrace]) => ({
+      children: contents || [],
+      position: locationFromTokens(openBrace, closeBrace),
+    }))
+  %}
+
+ListContents ->
+  Value (_ Value {% nth(1) %} ):*
+  {%
+    ([first, rest]) => (
+      rest
+        ? [first].concat(rest)
+        : [first]
+    )
+  %}
+
+Value -> List {% id %} | Primitive {% id %} | Section {% id %}
 
 Key -> Identifier {% asNode('Key', ([d]) => ({ name: d.value, children: [d], position: d.position })) %}
   | StringLiteral {% asNode('Key', ([d]) => ({ name: d, children: [d], position: d.position })) %}

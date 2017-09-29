@@ -25,6 +25,8 @@ const main: moo.Rules = {
   identifier: /[A-Za-z_][A-Za-z0-9_-]*/,
   openBrace: "{",
   closeBrace: "}",
+  openSqBrace: "[",
+  closeSqBrace: "]",
   dot: ".",
   comma: ",",
   equal: "=",
