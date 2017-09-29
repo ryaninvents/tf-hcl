@@ -54,7 +54,10 @@
   "release": {
     "branch": "develop",
     "analyzeCommits": {
-      "preset": "eslint"
+      "preset": "eslint",
+      "releaseRules": [
+        {"tag": "Docs", "scope":"README", "release": "patch"}
+      ]
     }
   },
   "engines": {
