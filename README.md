@@ -6,6 +6,10 @@
 
 Hashicorp Config Language parsing/generating.
 
+<a target='\_blank' rel='nofollow' href='https://app.codesponsor.io/link/RVo9FsqZMcz5f3Gryj26bAcB/r24y/tf-hcl'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/RVo9FsqZMcz5f3Gryj26bAcB/r24y/tf-hcl.svg' />
+</a>
+
 ## Usage
 
 ```javascript
