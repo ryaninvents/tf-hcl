@@ -1,10 +1,20 @@
+---
+title: README
+path: /readme/
+layout: home
+---
+
 [![Build Status](https://travis-ci.org/r24y/tf-hcl.svg)](https://travis-ci.org/r24y/tf-hcl)
 [![Coverage Status](https://coveralls.io/repos/github/r24y/tf-hcl/badge.svg?branch=develop)](https://coveralls.io/github/r24y/tf-hcl?branch=develop)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
+<!-- homepage hide start -->
+
 # tf-hcl
 
 Hashicorp Config Language parsing/generating.
+
+<!-- homepage hide end -->
 
 ## Usage
 

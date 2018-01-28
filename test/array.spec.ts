@@ -13,8 +13,5 @@ test("deep assignment", t => {
   t.is(parser.results.length, 1);
 
   const [ast] = parser.results;
-  t.snapshot(
-    (inspect as any).noColor(ast),
-    "deep assignments"
-  );
-})
+  t.snapshot((inspect as any).noColor(ast), "deep assignments");
+});
