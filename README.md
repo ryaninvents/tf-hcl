@@ -6,10 +6,6 @@
 
 Hashicorp Config Language parsing/generating.
 
-<a target='\_blank' rel='nofollow' href='https://app.codesponsor.io/link/RVo9FsqZMcz5f3Gryj26bAcB/r24y/tf-hcl'>
-  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/RVo9FsqZMcz5f3Gryj26bAcB/r24y/tf-hcl.svg' />
-</a>
-
 ## Usage
 
 ```javascript
@@ -35,4 +31,4 @@ AST follows the [Unist](https://github.com/syntax-tree/unist) schema but is othe
 
 ## Contributing
 
-This project uses [ESLint-style commit messages](https://github.com/conventional-changelog/conventional-changelog/blob/master/packages/conventional-changelog-eslint/convention.md).
+This project uses [ESLint-style commit messages](https://github.com/conventional-changelog/conventional-changelog/blob/master/packages/conventional-changelog-eslint/readme.md).
