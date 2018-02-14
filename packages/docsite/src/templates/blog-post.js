@@ -2,7 +2,6 @@ import get from 'lodash/get'
 import Helmet from 'react-helmet'
 import Link from 'gatsby-link'
 import React from 'react'
-import striptags from 'striptags'
 
 import SitePost from '../components/SitePost'
 import SitePage from '../components/SitePage'
@@ -30,10 +29,10 @@ class BlogPostTemplate extends React.Component {
             { name: 'twitter:site', content: `@${get(site, 'meta.twitter')}` },
             { property: 'og:title', content: get(post, 'frontmatter.title') },
             { property: 'og:type', content: 'article' },
-            {
-              property: 'og:description',
-              content: striptags(get(post, 'html')).substr(0, 200),
-            },
+            // {
+            //   property: 'og:description',
+            //   content: striptags(get(post, 'html')).substr(0, 200),
+            // },
             {
               property: 'og:url',
               content: get(site, 'meta.url') + get(post, 'frontmatter.path'),

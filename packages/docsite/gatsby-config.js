@@ -65,15 +65,7 @@ module.exports = {
         ],
       },
     },
-    {
-      resolve: 'gatsby-plugin-google-analytics',
-      options: {
-        trackingId: '',
-      },
-    },
     'gatsby-plugin-catch-links',
-    'gatsby-plugin-netlify',
-    'gatsby-plugin-offline',
     'gatsby-plugin-react-helmet',
     'gatsby-plugin-react-next',
     'gatsby-plugin-sass',
