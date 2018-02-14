@@ -15,7 +15,6 @@ after_script:
   - 'cat coverage/lcov.info | ./node_modules/.bin/coveralls' # sends the coverage report to coveralls
 after_success:
   - npx travis-deploy-once 'npm run semantic-release'
-  - npm run build:docs
   - ./deploy.sh
 branches:
   except:
