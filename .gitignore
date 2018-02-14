@@ -6,6 +6,7 @@ npm-debug.log
 /lib_test/src
 /lib_test/test/**/*.spec.js
 /lib_test/test/util.js
-/package-lock.json
+package-lock.json
+yarn.lock
 
 /src/hcl.ne.ts

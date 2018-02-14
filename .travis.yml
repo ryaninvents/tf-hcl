@@ -6,8 +6,6 @@ notifications:
   email: false
 node_js:
   - '8'
-  - '7'
-  - '6'
 script:
   - npm test
   - npm run coverage
@@ -16,7 +14,8 @@ before_script:
 after_script:
   - 'cat coverage/lcov.info | ./node_modules/.bin/coveralls' # sends the coverage report to coveralls
 after_success:
-  - npm run semantic-release
+  - npx travis-deploy-once 'npm run semantic-release'
+  - ./deploy.sh
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/

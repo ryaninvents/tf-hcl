@@ -19,14 +19,17 @@
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "prepublish": "npm run build",
     "prebuild": "npm run clean && npm run prettier && npm run lint && echo Using TypeScript && tsc --version",
-    "build": "rimraf src/hcl.ne.ts && npm run -s build:nearley && tsc --pretty",
+    "build": "rimraf src/hcl.ne.ts && npm run -s build:nearley && tsc --pretty && lerna run build",
     "build:nearley": "nearleyc --out src/hcl.ne.ts src/hcl.ne",
+    "build:docs": "cd packages/docsite && npm run build",
     "test": "npm run clean && npm run -s build:nearley && tsc -p tsconfig.test.json --pretty && nyc ava \"**/*.spec.js\" --verbose",
     "test:grammar": "npm run -s build && nearley-test lib/hcl.ne.js",
     "coverage": "nyc report --reporter=lcov --reporter=text --reporter=html",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "postinstall": "lerna bootstrap",
+    "deploy": "gh-pages -d packages/docsite/public"
   },
   "dependencies": {
     "moo": "^0.3.3",
@@ -39,6 +42,8 @@
     "ava": "^0.20.0",
     "conventional-changelog-eslint": "^0.2.0",
     "coveralls": "^2.0.0",
+    "gh-pages": "^1.1.0",
+    "lerna": "^2.8.0",
     "nearley": "^2.10.2",
     "nyc": "^10.0.0",
     "prettier": "^1.5.2",
