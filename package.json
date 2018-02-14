@@ -27,7 +27,7 @@
     "coverage": "nyc report --reporter=lcov --reporter=text --reporter=html",
     "watch": "npm run build -- --watch",
     "watch:test": "npm run test -- --watch",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "semantic-release": "npx semantic-release",
     "postinstall": "lerna bootstrap",
     "deploy": "gh-pages -d packages/docsite/public"
   },
