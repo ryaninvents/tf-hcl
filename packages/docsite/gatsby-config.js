@@ -10,10 +10,12 @@ module.exports = {
   pathPrefix: '/',
   plugins: [
     {
-      resolve: 'gatsby-source-filesystem',
+      resolve: '@r24y/gatsby-source-filesystem',
       options: {
-        path: `${__dirname}/src/pages`,
+        path: [`${__dirname}/../../README.md`, `${__dirname}/src/pages`],
+        rootPath: `${__dirname}/src/pages`,
         name: 'pages',
+        skipPathCheck: true,
       },
     },
     {

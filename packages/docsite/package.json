@@ -27,7 +27,6 @@
     "gatsby-remark-prismjs": "^1.2.11",
     "gatsby-remark-responsive-iframe": "^1.4.16",
     "gatsby-remark-smartypants": "^1.4.10",
-    "gatsby-source-filesystem": "^1.5.10",
     "gatsby-transformer-remark": "^1.7.24",
     "gatsby-transformer-sharp": "^1.6.16",
     "lodash": "^4.17.4",
@@ -40,6 +39,7 @@
     "tf-hcl": "file:../.."
   },
   "devDependencies": {
+    "@r24y/gatsby-source-filesystem": "^1.5.20",
     "animate.css": "^3.5.2",
     "babel-eslint": "^8.0.3",
     "bootstrap": "4.0.0-beta.2",
@@ -90,7 +90,6 @@
   },
   "main": "n/a",
   "scripts": {
-    "prebuild": "cp ../../README.md src/pages/README.md",
     "build": "gatsby build",
     "deploy": "gatsby build --prefix-paths && gh-pages -d public",
     "develop": "gatsby develop",
